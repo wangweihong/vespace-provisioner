@@ -44,7 +44,7 @@ func (vc *vespaceClient) AddVolume(opt VolumeAddOption) error {
 		return nil
 	}
 
-	return fmt.Errorf("Vespace Error: %v" + resp.Message)
+	return fmt.Errorf("Vespace Error: Code:%v, Message:%v", resp.Ecode, resp.Message)
 	//挂载iscsi
 
 }
@@ -97,7 +97,7 @@ func (vc *vespaceClient) DeleteVolume(opt VolumeGetOption) error {
 	case OK:
 		return nil
 	default:
-		return fmt.Errorf("Vespace error: code:%v,message:%v", resp.Ecode, resp.Message)
+		return fmt.Errorf("Vespace Error: Code:%v, Message:%v", resp.Ecode, resp.Message)
 	}
 }
 
@@ -143,12 +143,12 @@ func (vc *vespaceClient) UmountVolume(hosts []string, volgetopt VolumeGetOption)
 		return nil
 	}
 
-	return fmt.Errorf("Vespace Error: %v" + resp.Message)
+	return fmt.Errorf("Vespace Error: Code:%v, Message:%v", resp.Ecode, resp.Message)
 }
 
 func (vc *vespaceClient) MountVolume(hosts []string, volgetopt VolumeGetOption) error {
 	if len(hosts) == 0 {
-		fmt.Errorf("neet to provide host to mount")
+		return fmt.Errorf("need to provide host to mount")
 	}
 
 	var vuo VolumeMountOption
@@ -174,7 +174,7 @@ func (vc *vespaceClient) MountVolume(hosts []string, volgetopt VolumeGetOption) 
 		return nil
 	}
 
-	return fmt.Errorf("Vespace Error: %v" + resp.Message)
+	return fmt.Errorf("Vespace Error: Code:%v, Message:%v", resp.Ecode, resp.Message)
 }
 
 type Volume struct {
@@ -206,7 +206,7 @@ func (vc *vespaceClient) GetVolume(opt VolumeGetOption) (*Volume, error) {
 
 		return &vol, nil
 	default:
-		return nil, fmt.Errorf("Vespace error: code:%v,message:%v", resp.Ecode, resp.Message)
+		return nil, fmt.Errorf("Vespace Error: Code:%v, Message:%v", resp.Ecode, resp.Message)
 
 	}
 }
