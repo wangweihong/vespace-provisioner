@@ -11,7 +11,7 @@ spec:
     - --password=admin
     - --vespace=192.168.3.62:8081
     name: vespace-provisioner
-    image: 192.168.18.250:5002/ufleet/vespace-provisioner:v1.0.1
+    image: 192.168.18.250:5002/ufleet/vespace-provisioner:v1.0.3
     volumeMounts:
       - name: k8sconfig-volume
         mountPath: /etc/kubeconfig
