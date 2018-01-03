@@ -3,14 +3,11 @@ package main
 import (
 	"flag"
 	"strings"
-	"vespace-provisioner/pkg/volume"
+	"vespace-provisioner/start"
 
 	"github.com/golang/glog"
-	"github.com/kubernetes-incubator/external-storage/lib/controller"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -47,32 +44,14 @@ func main() {
 	if *username == "" || *password == "" || *vespacehost == "" {
 		glog.Fatalf("Invalid vespace client login info.")
 	}
-
-	clientset, err := kubernetes.NewForConfig(config)
+	err = start.Init(*vespacehost, *username, *password, config, *provisioner)
 	if err != nil {
-		glog.Fatalf("Failed to create client: %v", err)
+		glog.Fatal(err)
 	}
 
-	serverVersion, err := clientset.Discovery().ServerVersion()
-	if err != nil {
-		glog.Fatalf("Error getting server version: %v", err)
-	}
+	nevercall := make(chan struct{})
+	<-nevercall
 
-	vespaceProvisioner, err := volume.NewVespaceProvisioner(*vespacehost, *username, *password)
-	if err != nil {
-		glog.Fatalf("Error create vespace provisioner: %v", err)
-
-	}
-
-	// Start the provision controller which will dynamically provision NFS PVs
-	pc := controller.NewProvisionController(
-		clientset,
-		*provisioner,
-		vespaceProvisioner,
-		serverVersion.GitVersion,
-	)
-
-	pc.Run(wait.NeverStop)
 }
 
 // validateProvisioner tests if provisioner is a valid qualified name.
