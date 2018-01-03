@@ -2,12 +2,9 @@ package main
 
 import (
 	"flag"
-	"strings"
 	"vespace-provisioner/start"
 
 	"github.com/golang/glog"
-	"k8s.io/apimachinery/pkg/util/validation"
-	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -24,10 +21,6 @@ var (
 func main() {
 	flag.Set("logtostderr", "true")
 	flag.Parse()
-
-	if errs := validateProvisioner(*provisioner, field.NewPath("provisioner")); len(errs) != 0 {
-		glog.Fatalf("Invalid provisioner specified: %v", errs)
-	}
 
 	outOfCluster := *master != "" || *kubeconfig != ""
 	var config *rest.Config
@@ -52,19 +45,4 @@ func main() {
 	nevercall := make(chan struct{})
 	<-nevercall
 
-}
-
-// validateProvisioner tests if provisioner is a valid qualified name.
-// https://github.com/kubernetes/kubernetes/blob/release-1.4/pkg/apis/storage/validation/validation.go
-func validateProvisioner(provisioner string, fldPath *field.Path) field.ErrorList {
-	allErrs := field.ErrorList{}
-	if len(provisioner) == 0 {
-		allErrs = append(allErrs, field.Required(fldPath, provisioner))
-	}
-	if len(provisioner) > 0 {
-		for _, msg := range validation.IsQualifiedName(strings.ToLower(provisioner)) {
-			allErrs = append(allErrs, field.Invalid(fldPath, provisioner, msg))
-		}
-	}
-	return allErrs
 }
