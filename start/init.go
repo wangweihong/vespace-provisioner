@@ -9,12 +9,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	"github.com/kubernetes-incubator/external-storage/lib/controller"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
-func Init(vespacehost string, username string, password string, config *rest.Config, provisioner string) error {
+func Init(vespacehost string, username string, password string, config *rest.Config, provisioner string, stopChan chan struct{}) error {
 	if errs := validateProvisioner(provisioner, field.NewPath("provisioner")); len(errs) != 0 {
 		return fmt.Errorf("Invalid provisioner specified: %v", errs)
 	}
@@ -39,7 +38,7 @@ func Init(vespacehost string, username string, password string, config *rest.Con
 		vespaceProvisioner,
 		serverVersion.GitVersion,
 	)
-	go pc.Run(wait.NeverStop)
+	go pc.Run(stopChan)
 	return nil
 
 }

@@ -21,6 +21,7 @@ var (
 func main() {
 	flag.Set("logtostderr", "true")
 	flag.Parse()
+	nevercall := make(chan struct{})
 
 	outOfCluster := *master != "" || *kubeconfig != ""
 	var config *rest.Config
@@ -37,12 +38,11 @@ func main() {
 	if *username == "" || *password == "" || *vespacehost == "" {
 		glog.Fatalf("Invalid vespace client login info.")
 	}
-	err = start.Init(*vespacehost, *username, *password, config, *provisioner)
+	err = start.Init(*vespacehost, *username, *password, config, *provisioner, nevercall)
 	if err != nil {
 		glog.Fatal(err)
 	}
 
-	nevercall := make(chan struct{})
 	<-nevercall
 
 }
